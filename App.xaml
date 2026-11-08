@@ -1,0 +1,65 @@
+<Application x:Class="OpenXRChanger.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <Application.Resources>
+  <SolidColorBrush x:Key="Bg" Color="#070b1a"/><SolidColorBrush x:Key="Surface" Color="#0e1530"/><SolidColorBrush x:Key="Line" Color="#253056"/><SolidColorBrush x:Key="Muted" Color="#8e98b8"/><SolidColorBrush x:Key="Cyan" Color="#22d3ff"/>
+  <Style TargetType="Window"><Setter Property="Background" Value="{StaticResource Bg}"/><Setter Property="Foreground" Value="#dce1f0"/><Setter Property="FontFamily" Value="Segoe UI"/><Setter Property="FontSize" Value="14"/></Style>
+  <Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style>
+  <Style TargetType="Button"><Setter Property="Foreground" Value="#ffffff"/><Setter Property="Background" Value="#151d3c"/><Setter Property="BorderBrush" Value="#253056"/><Setter Property="Padding" Value="10,6"/><Setter Property="Margin" Value="0,0,8,0"/><Setter Property="Cursor" Value="Hand"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border x:Name="B" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="B" Property="BorderBrush" Value="#22d3ff"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter TargetName="B" Property="Opacity" Value="0.4"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter></Style>
+  <Style TargetType="TextBox"><Setter Property="Background" Value="#151d3c"/><Setter Property="Foreground" Value="#ffffff"/><Setter Property="CaretBrush" Value="White"/><Setter Property="BorderBrush" Value="#253056"/><Setter Property="Padding" Value="10"/><Setter Property="Margin" Value="0,5,0,14"/></Style>
+  <Style TargetType="CheckBox"><Setter Property="Foreground" Value="#dce1f0"/><Setter Property="Margin" Value="0,8,0,12"/></Style>
+  <Style TargetType="Menu"><Setter Property="Background" Value="#101522"/><Setter Property="Foreground" Value="#dce1f0"/><Setter Property="Padding" Value="6,2"/><Setter Property="FontSize" Value="12"/></Style>
+  <ControlTemplate x:Key="MenuEntry" TargetType="MenuItem">
+   <Border x:Name="Highlight" Background="Transparent" CornerRadius="4" Padding="12,7" Margin="2,0">
+    <DockPanel><TextBlock x:Name="Check" Text="☐" Width="20" Visibility="Collapsed" Margin="0"/><ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/></DockPanel>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Highlight" Property="Background" Value="#353044"/><Setter Property="Foreground" Value="#ffffff"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="#737b91"/></Trigger>
+    <Trigger Property="IsCheckable" Value="True"><Setter TargetName="Check" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsChecked" Value="True"><Setter TargetName="Check" Property="Text" Value="☑"/><Setter TargetName="Check" Property="Foreground" Value="#b88cff"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate>
+  <ControlTemplate x:Key="MenuHeading" TargetType="MenuItem">
+   <Grid>
+    <Border x:Name="Highlight" Background="Transparent" CornerRadius="4" Padding="10,4"><ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/></Border>
+    <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+     <Border Background="#20212a" BorderBrush="#373946" BorderThickness="1" CornerRadius="5" Padding="3,4" MinWidth="180"><StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/></Border>
+    </Popup>
+   </Grid>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Highlight" Property="Background" Value="#353044"/><Setter Property="Foreground" Value="#ffffff"/></Trigger>
+    <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="Highlight" Property="Background" Value="#353044"/><Setter Property="Foreground" Value="#ffffff"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate>
+  <Style TargetType="MenuItem">
+   <Setter Property="Foreground" Value="#e8e9ef"/><Setter Property="FontSize" Value="12"/><Setter Property="Template" Value="{StaticResource MenuEntry}"/>
+   <Style.Triggers><Trigger Property="Role" Value="TopLevelHeader"><Setter Property="Template" Value="{StaticResource MenuHeading}"/></Trigger></Style.Triggers>
+  </Style>
+  <Style TargetType="ComboBoxItem">
+   <Setter Property="Foreground" Value="#e8e9ef"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBoxItem">
+    <Border x:Name="Item" Background="#151d3c" Padding="10,7" CornerRadius="4"><ContentPresenter/></Border>
+    <ControlTemplate.Triggers>
+     <Trigger Property="IsSelected" Value="True"><Setter TargetName="Item" Property="Background" Value="#353044"/></Trigger>
+     <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Item" Property="Background" Value="#45365e"/><Setter Property="Foreground" Value="White"/></Trigger>
+    </ControlTemplate.Triggers>
+   </ControlTemplate></Setter.Value></Setter>
+  </Style>
+  <Style TargetType="ComboBox">
+   <Setter Property="Foreground" Value="#e8e9ef"/><Setter Property="Background" Value="#151d3c"/><Setter Property="BorderBrush" Value="#384569"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBox">
+    <Grid>
+     <ToggleButton Focusable="False" IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+      <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+       <Border x:Name="Frame" Background="#151d3c" BorderBrush="#384569" BorderThickness="1" CornerRadius="6" MinHeight="32"><TextBlock Text="⌄" Foreground="#aeb8d2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/></Border>
+       <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#22d3ff"/></Trigger><Trigger Property="IsChecked" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#9b5cff"/></Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></ToggleButton.Template>
+     </ToggleButton>
+     <ContentPresenter Margin="10,6,30,6" VerticalAlignment="Center" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+     <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False">
+      <Border Background="#151d3c" BorderBrush="#384569" BorderThickness="1" CornerRadius="6" Padding="3" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"><ScrollViewer MaxHeight="240" CanContentScroll="True"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/></ScrollViewer></Border>
+     </Popup>
+    </Grid>
+   </ControlTemplate></Setter.Value></Setter>
+  </Style>
+ </Application.Resources>
+</Application>
