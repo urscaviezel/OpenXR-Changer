@@ -7,6 +7,8 @@
 
 [English](#english) · [Deutsch](#deutsch)
 
+![OpenXR Changer – runtime overview / Runtime-Übersicht](Screenshot.png)
+
 ## English
 
 OpenXR Changer shows your installed OpenXR runtimes in a compact two-column view and lets you change the Windows system default. The active runtime is highlighted, and the window adjusts its height to the visible entries.
