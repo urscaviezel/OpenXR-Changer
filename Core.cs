@@ -18,7 +18,13 @@ public sealed class RuntimeEntry
 }
 public sealed class Preferences
 {
-    public string Language { get; set; } = "de";
+    public string Language { get; set; } = DefaultLanguage();
+    static string DefaultLanguage() => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+    {
+        "de" => "de",
+        "fr" => "fr",
+        _ => "en"
+    };
     public bool CheckUpdates { get; set; } = true;
     public bool StartInTray { get; set; }
     public bool CloseToTray { get; set; } = true;

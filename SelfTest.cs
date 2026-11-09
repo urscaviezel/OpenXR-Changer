@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 
@@ -14,6 +14,21 @@ public static class SelfTest
         try
         {
             Store.Root = root + Path.DirectorySeparatorChar;
+            var previousCulture = System.Globalization.CultureInfo.CurrentUICulture;
+            try
+            {
+                foreach (var (culture, expected) in new[] { ("de-CH", "de"), ("de-DE", "de"), ("en-US", "en"), ("en-GB", "en"), ("fr-CA", "fr"), ("it-CH", "en"), ("ja-JP", "en") })
+                {
+                    System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo(culture);
+                    Assert(Store.Load().Language == expected, "first-start UI language: " + culture);
+                }
+                System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+                Store.Save(new Preferences { Language = "fr" });
+                Assert(Store.Load().Language == "fr", "saved language overrides system language");
+                Store.Save(new Preferences { Language = "it" });
+                Assert(Store.Load().Language == "it", "custom saved language retained");
+            }
+            finally { System.Globalization.CultureInfo.CurrentUICulture = previousCulture; }
             var p = new Preferences { Language = "fr", CheckUpdates = false, StartInTray = true, CloseToTray = false, Runtimes = [new() { Name = "Test", Path = "runtime.json", Logo = "portable/logos/test.png", Visible = false, Custom = true }] };
             Store.Save(p); Store.Save(p);
             var loaded = Store.Load(); Assert(loaded.Language == "fr" && !loaded.CheckUpdates && !loaded.Runtimes[0].Visible, "portable settings round trip");

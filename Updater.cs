@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -11,7 +11,7 @@ public record Release(string Version, string Url, string Digest);
 public static class Updater
 {
     public const string Repository = "https://github.com/urscaviezel/OpenXR-Changer";
-    public const string Version = "0.1.8";
+    public const string Version = "0.1.9";
     static HttpClient Client()
     { var client = new HttpClient { Timeout = TimeSpan.FromSeconds(60) }; client.DefaultRequestHeaders.UserAgent.ParseAdd("OpenXR-Changer/" + Version); return client; }
     public static async Task<Release?> Check()

@@ -168,3 +168,8 @@ Based on / Basierend auf [OpenXR Runtime Switcher by WaGi-Coding](https://github
 MIT license / MIT-Lizenz: [LICENSE.txt](LICENSE.txt).
 
 Product names and logos belong to their respective owners. Some logo assets were prepared with AI-assisted background removal. / Produktnamen und Logos gehören ihren jeweiligen Rechteinhabern. Einige Logos wurden mit KI-Unterstützung freigestellt.
+
+
+First start: the Windows display language selects German, French or English; unsupported languages fall back to English. Saved language choices are kept.
+
+Erster Start: Die Windows-Anzeigesprache bestimmt Deutsch, Französisch oder Englisch; bei anderen Sprachen wird Englisch verwendet. Gespeicherte Sprachwahlen bleiben erhalten.
