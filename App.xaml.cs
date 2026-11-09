@@ -5,6 +5,12 @@ using System.Windows;
 namespace OpenXRChanger;
 public partial class App : Application
 {
+    SingleInstance? instance;
+    protected override void OnExit(ExitEventArgs e)
+    {
+        instance?.Dispose();
+        base.OnExit(e);
+    }
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -21,7 +27,10 @@ public partial class App : Application
             }
             if (e.Args.Length == 2 && e.Args[0] == "--self-test")
             { SelfTest.Run(e.Args[1]); Shutdown(); return; }
+            instance = new SingleInstance();
+            if (!instance.TryAcquire()) { Shutdown(); return; }
             MainWindow = new MainWindow(); MainWindow.Show();
+            instance.Listen(MainWindow);
         }
         catch (Exception ex) { MessageBox.Show(ex.Message, "OpenXR Changer", MessageBoxButton.OK, MessageBoxImage.Error); Shutdown(1); }
     }

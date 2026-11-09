@@ -11,7 +11,7 @@ public record Release(string Version, string Url, string Digest);
 public static class Updater
 {
     public const string Repository = "https://github.com/urscaviezel/OpenXR-Changer";
-    public const string Version = "0.1.6";
+    public const string Version = "0.1.7";
     static HttpClient Client()
     { var client = new HttpClient { Timeout = TimeSpan.FromSeconds(60) }; client.DefaultRequestHeaders.UserAgent.ParseAdd("OpenXR-Changer/" + Version); return client; }
     public static async Task<Release?> Check()

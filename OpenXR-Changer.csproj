@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
-    <AssemblyName>OpenXR-Changer</AssemblyName><RootNamespace>OpenXRChanger</RootNamespace><Version>0.1.6</Version>
+    <AssemblyName>OpenXR-Changer</AssemblyName><RootNamespace>OpenXRChanger</RootNamespace><Version>0.1.7</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest><ApplicationIcon>assets\OpenXR-Changer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup><Content Include="lang\*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" /><Content Include="assets\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" /></ItemGroup>
