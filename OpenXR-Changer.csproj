@@ -1,9 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
-    <AssemblyName>OpenXR-Changer</AssemblyName><RootNamespace>OpenXRChanger</RootNamespace><Version>0.1.7</Version>
+    <UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <AssemblyName>OpenXR-Changer</AssemblyName><RootNamespace>OpenXRChanger</RootNamespace><Version>0.1.8</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest><ApplicationIcon>assets\OpenXR-Changer.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup><Compile Remove="helper\**\*.cs;artifacts\**\*.cs" /><Compile Include="helper\Protocol.cs" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="lang\*.json" LogicalName="OpenXRChanger.Languages.%(Filename).json" /></ItemGroup>
+  <ItemGroup><Using Remove="System.Windows.Forms" /><Using Remove="System.Drawing" /></ItemGroup>
   <ItemGroup><Content Include="lang\*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" /><Content Include="assets\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" /></ItemGroup>
 </Project>

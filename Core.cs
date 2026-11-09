@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -20,6 +20,8 @@ public sealed class Preferences
 {
     public string Language { get; set; } = "de";
     public bool CheckUpdates { get; set; } = true;
+    public bool StartInTray { get; set; }
+    public bool CloseToTray { get; set; } = true;
     public List<RuntimeEntry> Runtimes { get; set; } = [];
 }
 public static class Store
@@ -56,7 +58,10 @@ public sealed class Language
     {
         if (System.IO.Path.GetFileName(id) != id) return [];
         var path = System.IO.Path.Combine(Store.Root, "lang", id + ".json");
-        return File.Exists(path) ? JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path)) ?? [] : [];
+        using var builtIn = typeof(Language).Assembly.GetManifestResourceStream("OpenXRChanger.Languages." + id + ".json");
+        var values = builtIn == null ? new Dictionary<string, string>() : JsonSerializer.Deserialize<Dictionary<string, string>>(builtIn) ?? [];
+        if (File.Exists(path)) foreach (var pair in JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path)) ?? []) if (!LegacyTranslations.IsDamaged(id, pair.Key, pair.Value)) values[pair.Key] = pair.Value;
+        return values;
     }
     public string this[string key] => words.GetValueOrDefault(key, fallback.GetValueOrDefault(key, key));
 }

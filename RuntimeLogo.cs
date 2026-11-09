@@ -25,6 +25,25 @@ public static class RuntimeLogo
             if (pixels[(y * w + x) * 4 + 3] > 24) { left = Math.Min(left, x); right = Math.Max(right, x); top = Math.Min(top, y); bottom = Math.Max(bottom, y); }
         return right < left ? new Rect(0, 0, 1, 1) : new Rect((double)left / w, (double)top / h, (double)(right - left + 1) / w, (double)(bottom - top + 1) / h);
     }
+    // Render the same cropped logo used by the cards into a compact tray image.
+    // The caller owns the bitmap and disposes it when rebuilding the menu.
+    public static System.Drawing.Bitmap? CreateTrayBitmap(RuntimeEntry runtime)
+    {
+        var visual = Create(runtime);
+        if (visual == null) return null;
+        visual.Width = 24; visual.Height = 24;
+        visual.Measure(new Size(24, 24));
+        visual.Arrange(new Rect(0, 0, 24, 24));
+        var rendered = new RenderTargetBitmap(48, 48, 192, 192, PixelFormats.Pbgra32);
+        rendered.Render(visual);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(rendered));
+        using var stream = new MemoryStream();
+        encoder.Save(stream); stream.Position = 0;
+        using var decoded = new System.Drawing.Bitmap(stream);
+        return new System.Drawing.Bitmap(decoded);
+    }
+
     public static FrameworkElement? Create(RuntimeEntry runtime)
     {
         try

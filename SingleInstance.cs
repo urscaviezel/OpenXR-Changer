@@ -10,6 +10,7 @@ namespace OpenXRChanger;
 internal sealed class SingleInstance : IDisposable
 {
     readonly Mutex mutex;
+    readonly Mutex uninstallMarker = new(false, @"Local\OpenXRChanger-AppRunning");
     readonly EventWaitHandle activation;
     RegisteredWaitHandle? listener;
     bool ownsMutex;
@@ -54,6 +55,7 @@ internal sealed class SingleInstance : IDisposable
         listener?.Unregister(null);
         if (ownsMutex) { mutex.ReleaseMutex(); ownsMutex = false; }
         mutex.Dispose();
+        uninstallMarker.Dispose();
         activation.Dispose();
     }
 

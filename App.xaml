@@ -30,9 +30,21 @@
     <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="Highlight" Property="Background" Value="#353044"/><Setter Property="Foreground" Value="#ffffff"/></Trigger>
    </ControlTemplate.Triggers>
   </ControlTemplate>
+  <ControlTemplate x:Key="MenuSubheading" TargetType="MenuItem">
+   <Grid>
+    <Border x:Name="Highlight" Background="Transparent" CornerRadius="4" Padding="12,7"><DockPanel><TextBlock DockPanel.Dock="Right" Text="?" Margin="16,0,0,0"/><ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/></DockPanel></Border>
+    <Popup x:Name="PART_Popup" Placement="Right" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+     <Border Background="#20212a" BorderBrush="#373946" BorderThickness="1" CornerRadius="5" Padding="3,4" MinWidth="180"><StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/></Border>
+    </Popup>
+   </Grid>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Highlight" Property="Background" Value="#353044"/><Setter Property="Foreground" Value="#ffffff"/></Trigger>
+    <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="Highlight" Property="Background" Value="#353044"/><Setter Property="Foreground" Value="#ffffff"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate>
   <Style TargetType="MenuItem">
    <Setter Property="Foreground" Value="#e8e9ef"/><Setter Property="FontSize" Value="12"/><Setter Property="Template" Value="{StaticResource MenuEntry}"/>
-   <Style.Triggers><Trigger Property="Role" Value="TopLevelHeader"><Setter Property="Template" Value="{StaticResource MenuHeading}"/></Trigger></Style.Triggers>
+   <Style.Triggers><Trigger Property="Role" Value="TopLevelHeader"><Setter Property="Template" Value="{StaticResource MenuHeading}"/></Trigger><Trigger Property="Role" Value="SubmenuHeader"><Setter Property="Template" Value="{StaticResource MenuSubheading}"/></Trigger></Style.Triggers>
   </Style>
   <Style TargetType="ComboBoxItem">
    <Setter Property="Foreground" Value="#e8e9ef"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>

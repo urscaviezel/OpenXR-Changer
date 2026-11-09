@@ -7,9 +7,21 @@
 
 [English](#english) · [Deutsch](#deutsch)
 
+![OpenXR Changer – runtime overview / Runtime-Übersicht](Screenshot.png)
+
 ## English
 
 OpenXR Changer shows your installed OpenXR runtimes in a compact two-column view and lets you change the Windows system default. The active runtime is highlighted, and the window adjusts its height to the visible entries.
+
+### Tray and quick switching
+
+Right-click the tray icon to select a visible runtime. The current runtime has a small green dot and green highlighting; unavailable entries are disabled. Double-click opens the main window. **Settings → Tray** controls starting in the tray and keeping the app running when its window is closed. Choose **Exit** in the tray menu or under **Info** to quit completely.
+
+**Settings → Switch without UAC → Set up / repair** optionally installs a dedicated Windows service after one administrator confirmation. It permits the configured Windows user to select local x64 runtime manifests while the app stays unelevated, including after reboot. Network paths and filesystem links are rejected. The service runs as LocalService with a service-specific registry permission; it does not execute runtime DLLs. If configured but unavailable, switching fails without falling back to a surprise UAC prompt. Use **Check connection** to verify it. Choose **Uninstall helper** in this dialog or remove **OpenXR Changer Runtime Helper** through Windows Apps to revoke the permission. The active runtime is preserved. The helper is separate from the per-user app and is not removed by uninstalling that app. The portable package also includes its installer, but using the helper adds this installed component to the machine. Changing the helper itself requires a fresh administrator confirmation.
+
+Alternatively, **Settings → Restart as administrator** grants the whole app elevated rights for the current session only. Without either option, each switch requires the normal Windows approval. UAC remains enabled in every mode.
+
+The optional **OpenXR-Changer-Setup-win-x64.exe** installs for the current Windows user, adds a Start menu entry and offers desktop and tray-autostart shortcuts. Autostart runs with normal permissions. Installation does not import a separate portable copy's settings automatically. Close the portable copy before starting the installed app. Uninstall asks whether to keep or remove settings, imported logos and language files; keeping them is the default. A running app, including tray mode, must be closed before anything is removed. Windows-managed application history/cache entries can remain.
 
 ### Download and start
 
@@ -32,7 +44,7 @@ No installer or separate .NET runtime is required. To move the app, move its ent
 
 ### Usage
 
-Select **Activate** beside an installed runtime. Windows requests administrator approval for the switch. Restart running VR applications afterwards.
+Select **Activate** beside an installed runtime. Without the optional helper or administrator mode, Windows requests administrator approval. Restart running VR applications afterwards.
 
 - **Settings → Language settings:** select the interface language; changes are saved immediately.
 - **Settings → Manage runtimes:** add, edit, show or hide entries.
@@ -52,7 +64,7 @@ The app changes the **64-bit Windows system default** at `HKLM\SOFTWARE\Khronos\
 
 To add a language, copy a JSON file, translate its values and save it as UTF-8 with a language-code filename, such as `it.json`. Reopen the language dialog to select it. Missing keys fall back to English.
 
-Updates preserve portable data and existing language files. If a release adds translation keys, merge them into your existing files when needed. Installed runtime paths still point to the software on the current PC; moving the app does not move the runtimes themselves.
+Updates preserve portable data and existing language files. New built-in translation keys remain available even when your existing JSON files do not contain them. Known damaged default translations from early 0.1.8 test builds are corrected without replacing custom translations. Installed runtime paths still point to the software on the current PC; moving the app does not move the runtimes themselves.
 
 ### Build and checks
 
@@ -62,7 +74,7 @@ Requires Windows and the **.NET 10 SDK** for building only:
 .\build.ps1
 ```
 
-The script produces a fresh self-contained x64 build and `artifacts/OpenXR-Changer-win-x64.zip`, excluding personal settings. A development build is also possible with `dotnet build -c Release`.
+The script produces a fresh self-contained x64 build and `artifacts/OpenXR-Changer-win-x64.zip`, excluding personal settings. A development build is also possible with `dotnet build -c Release`. To build the installer, install Inno Setup 6 and run `./build-installer.ps1`.
 
 To run the included checks, supply an absolute report path in an existing directory:
 
@@ -70,11 +82,21 @@ To run the included checks, supply an absolute report path in an existing direct
 .\OpenXR-Changer.exe --self-test C:\Temp\openxr-checks.txt
 ```
 
-The checks do not switch your runtime. Version 0.1.6 passed 15 checks covering portable settings, language fallback, manifest filtering, repeatable discovery and update-archive validation. End-to-end installation of a future release remains to be verified.
+The checks do not switch your runtime. Version 0.1.8 passed 27 app self-tests and 20 helper checks. Live helper communication and runtime selection without repeated UAC prompts were tested. Installer checks cover preserving/removing user data and blocking uninstall while the app is running.
 
 ## Deutsch
 
 OpenXR Changer zeigt deine installierten OpenXR-Runtimes in einer kompakten zweispaltigen Ansicht und lässt dich den Windows-Systemstandard wechseln. Die aktive Runtime ist hervorgehoben, und die Fensterhöhe passt sich den sichtbaren Einträgen an.
+
+### Tray und Schnellwechsel
+
+Ein Rechtsklick auf das Tray-Symbol zeigt die eingeblendeten Runtimes. Die aktive Runtime hat einen kleinen grünen Punkt und ist grün hervorgehoben; nicht verfügbare Einträge sind deaktiviert. Ein Doppelklick öffnet das Hauptfenster. Unter **Settings → Tray** lässt sich einstellen, ob die App im Tray startet und beim Schliessen des Fensters weiterläuft. **Beenden** im Tray-Menü oder unter **Info** schliesst die App vollständig.
+
+**Settings → Umschalten ohne UAC → Einrichten / reparieren** installiert optional nach einer Administrator-Bestätigung einen eigenen Windows-Dienst. Dieser erlaubt dem eingerichteten Windows-Benutzer die Auswahl lokaler x64-Runtime-Manifeste, auch nach einem Neustart. Die App bleibt ohne erhöhte Rechte. Netzwerkpfade und Dateisystem-Verknüpfungen werden abgewiesen. Der Dienst läuft als LocalService mit einer eigenen Registry-Berechtigung und führt keine Runtime-DLLs aus. Ist er eingerichtet, aber nicht erreichbar, wird der Wechsel ohne überraschende Ersatz-UAC-Abfrage abgebrochen. Mit **Verbindung prüfen** lässt sich der Dienst testen. Zum Widerrufen **Helper deinstallieren** im Dialog verwenden oder **OpenXR Changer Runtime Helper** über Windows Apps entfernen. Die aktive Runtime bleibt erhalten. Der Helfer ist unabhängig von der App und wird bei deren Deinstallation nicht automatisch entfernt. Auch das portable Paket enthält den Helfer-Installer; seine Nutzung ergänzt jedoch eine installierte Komponente auf dem Rechner. Eine Änderung des Helfers selbst erfordert erneut eine Administrator-Bestätigung.
+
+Alternativ gibt **Settings → Als Administrator neu starten** der gesamten App erhöhte Rechte für die aktuelle Sitzung. Ohne diese beiden Optionen wird weiterhin jeder Wechsel über die normale Windows-Abfrage bestätigt. UAC bleibt in allen Varianten eingeschaltet.
+
+Die optionale **OpenXR-Changer-Setup-win-x64.exe** installiert für den aktuellen Windows-Benutzer, legt einen Startmenü-Eintrag an und bietet Desktop-Verknüpfung und Tray-Autostart an. Der Autostart erfolgt mit normalen Rechten. Einstellungen einer separaten portablen Kopie werden nicht automatisch importiert. Vor dem Start der installierten App die portable Kopie beenden. Bei der Deinstallation kannst du Einstellungen, eigene Logos und Sprachdateien behalten oder entfernen; standardmässig bleiben sie erhalten. Eine laufende App muss zuerst vollständig beendet werden, auch im Tray-Modus. Von Windows verwaltete Verlaufs- und Cache-Einträge können zurückbleiben.
 
 ### Herunterladen und starten
 
@@ -97,7 +119,7 @@ Kein Installer und keine separate .NET-Installation erforderlich. Zum Verschiebe
 
 ### Bedienung
 
-Neben einer installierten Runtime **Aktivieren** wählen. Windows fragt für den Wechsel nach Administratorrechten. Laufende VR-Anwendungen danach neu starten.
+Neben einer installierten Runtime **Aktivieren** wählen. Ohne Helferdienst oder Administrator-Modus fragt Windows für den Wechsel nach Administratorrechten. Laufende VR-Anwendungen danach neu starten.
 
 - **Settings → Spracheinstellung:** Sprache auswählen; Änderungen werden sofort gespeichert.
 - **Settings → Runtimes verwalten:** Einträge hinzufügen, bearbeiten, ein- oder ausblenden.
@@ -117,7 +139,7 @@ Die App ändert den **64-Bit-Windows-Systemstandard** unter `HKLM\SOFTWARE\Khron
 
 Für eine weitere Sprache eine JSON-Datei kopieren, die Werte übersetzen und als UTF-8 mit einem Sprachkürzel als Dateiname speichern, zum Beispiel `it.json`. Den Sprachdialog erneut öffnen, um sie auszuwählen. Fehlende Texte werden auf Englisch angezeigt.
 
-Updates behalten portable Daten und vorhandene Sprachdateien bei. Neue Übersetzungsschlüssel bei Bedarf in die vorhandenen Dateien übernehmen. Installierte Runtime-Pfade verweisen weiterhin auf die Software auf dem jeweiligen PC; beim Verschieben der App werden die Runtimes selbst nicht mitverschoben.
+Updates behalten portable Daten und vorhandene Sprachdateien bei. Neue integrierte Übersetzungsschlüssel bleiben auch bei älteren Sprachdateien verfügbar. Bekannte beschädigte Standardtexte aus frühen 0.1.8-Testversionen werden gezielt korrigiert. Installierte Runtime-Pfade verweisen weiterhin auf die Software auf dem jeweiligen PC; beim Verschieben der App werden die Runtimes selbst nicht mitverschoben.
 
 ### Bauen und prüfen
 
@@ -127,7 +149,7 @@ Zum Bauen werden Windows und das **.NET 10 SDK** benötigt:
 .\build.ps1
 ```
 
-Das Skript erstellt einen eigenständig lauffähigen x64-Build und `artifacts/OpenXR-Changer-win-x64.zip` ohne persönliche Einstellungen. Ein Entwicklungsbuild ist mit `dotnet build -c Release` möglich.
+Das Skript erstellt einen eigenständig lauffähigen x64-Build und `artifacts/OpenXR-Changer-win-x64.zip` ohne persönliche Einstellungen. Ein Entwicklungsbuild ist mit `dotnet build -c Release` möglich. Für ZIP inklusive Helper und den Installer Inno Setup 6 installieren und `./build-installer.ps1` ausführen.
 
 Die integrierten Prüfungen benötigen einen absoluten Berichtspfad in einem vorhandenen Ordner:
 
@@ -135,7 +157,7 @@ Die integrierten Prüfungen benötigen einen absoluten Berichtspfad in einem vor
 .\OpenXR-Changer.exe --self-test C:\Temp\openxr-checks.txt
 ```
 
-Die Prüfungen wechseln keine Runtime. Version 0.1.6 hat 15 Prüfungen bestanden, unter anderem für portable Einstellungen, Sprachfallback, Manifestfilterung, wiederholte Erkennung und die Prüfung von Update-Archiven. Die vollständige Installation eines zukünftigen Releases muss noch praktisch geprüft werden.
+Die Prüfungen wechseln keine Runtime. Version 0.1.8 hat 27 App-Selbsttests und 20 Helfer-Prüfungen bestanden. Die echte Helfer-Verbindung und Runtime-Wechsel ohne wiederholte UAC-Abfrage wurden getestet. Installer-Tests decken das Behalten und Entfernen von Benutzerdaten sowie die Sperre bei laufender App ab.
 
 ## Credits / Lizenz
 

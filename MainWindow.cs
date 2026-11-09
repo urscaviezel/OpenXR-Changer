@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace OpenXRChanger;
-public sealed class MainWindow : Window
+public sealed partial class MainWindow : Window
 {
     readonly Preferences prefs;
     readonly Language l = new();
@@ -27,7 +27,7 @@ public sealed class MainWindow : Window
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         timer.Tick += (_, _) => { if (RuntimeRegistry.Active != active) Refresh(); }; timer.Start();
         Closed += (_, _) => timer.Stop();
-        Loaded += async (_, _) => { if (prefs.CheckUpdates) await CheckUpdates(false); };
+        InitializeTray();
     }
     static Brush Brush(string color) => new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
     public static TextBlock Text(string text, double size = 14, string color = "#dce1f0") => new() { Text = text, FontSize = size, Foreground = Brush(color), Margin = new Thickness(0, 0, 0, 6) };
@@ -41,9 +41,12 @@ public sealed class MainWindow : Window
         var info = new MenuItem { Header = "Info" }; menu.Items.Add(info);
         void Item(MenuItem parent, string name, Action action) { var item = new MenuItem { Header = name }; item.Click += (_, _) => action(); parent.Items.Add(item); }
         Item(info, l["about"], About);
+        Item(info, l["hideToTray"], Hide);
+        Item(info, l["exit"], ExitApp);
         Item(info, l["checkUpdates"], async () => await CheckUpdates(true));
         var settings = new MenuItem { Header = l["settings"] }; menu.Items.Add(settings);
         Item(settings, l["languageSettings"], Settings); Item(settings, l["manage"], Manage);
+        AddTraySettings(settings);
         var autoUpdates = new MenuItem { Header = l["autoUpdates"], IsCheckable = true, IsChecked = prefs.CheckUpdates, StaysOpenOnClick = true };
         autoUpdates.Click += (_, _) => Safe(() => { var previous = prefs.CheckUpdates; prefs.CheckUpdates = autoUpdates.IsChecked; try { Store.Save(prefs); } catch { prefs.CheckUpdates = previous; autoUpdates.IsChecked = previous; throw; } });
         settings.Items.Add(autoUpdates);
@@ -95,17 +98,27 @@ public sealed class MainWindow : Window
     }
     async Task Activate(RuntimeEntry runtime)
     {
+        if (switching) return;
+        switching = true;
         try
         {
             if (!RuntimeRegistry.Validate(runtime.ResolvedPath, out var error)) throw new InvalidDataException(error);
+            if (IsAdministrator) RuntimeRegistry.Set(runtime.ResolvedPath);
+            else if (HelperClient.IsConfigured) await HelperClient.Send("set", runtime.ResolvedPath);
+            else
+            {
             var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true, Verb = "runas" };
             start.ArgumentList.Add("--set-runtime"); start.ArgumentList.Add(runtime.ResolvedPath);
             using var process = Process.Start(start) ?? throw new IOException(l["switchFailed"]); await process.WaitForExitAsync();
-            if (process.ExitCode != 0 || !RuntimeRegistry.Same(RuntimeRegistry.Active, runtime.ResolvedPath)) throw new IOException(l["switchFailed"]);
+            if (process.ExitCode != 0) throw new IOException(l["switchFailed"]);
+            }
+            if (!RuntimeRegistry.Same(RuntimeRegistry.Active, runtime.ResolvedPath)) throw new IOException(l["switchFailed"]);
             Refresh(); status.Text = l["switched"] + " " + runtime.Name;
+            if (tray != null) tray.Text = ("OpenXR Changer · " + runtime.Name)[..Math.Min(63, ("OpenXR Changer · " + runtime.Name).Length)];
         }
         catch (System.ComponentModel.Win32Exception ex) when (ex.NativeErrorCode == 1223) { status.Text = l["cancelled"]; }
         catch (Exception ex) { Error(ex); }
+        finally { switching = false; }
     }
     Window Dialog(string title, double width = 620, double height = 520) => new() { Title = title, Owner = this, Width = width, Height = height, MinWidth = width, MinHeight = height, WindowStartupLocation = WindowStartupLocation.CenterOwner };
     void Settings()
@@ -206,6 +219,7 @@ public sealed class MainWindow : Window
             var release = await Updater.Check(); status.Text = l["upToDate"];
             if (release == null) { if (manual) MessageBox.Show(this, l["upToDate"], Title); return; }
             status.Text = l["updateAvailable"] + " " + release.Version;
+            ShowMainWindow();
             if (MessageBox.Show(this, l["updatePrompt"] + "\n\nv" + release.Version, Title, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             status.Text = l["downloading"]; await Updater.Install(release); Application.Current.Shutdown();
         }
@@ -227,6 +241,6 @@ public sealed class MainWindow : Window
         window.ShowDialog();
     }
     static void Open(string url) => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-    void Error(Exception ex) => MessageBox.Show(this, ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
+    void Error(Exception ex) { ShowMainWindow(); MessageBox.Show(this, ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error); }
     void Safe(Action action) { try { action(); } catch (Exception ex) { Error(ex); } }
 }
